@@ -28,21 +28,6 @@ class DotStatusException(Exception):
             return 'Неправильно указан статус у точки!'
 
 
-class ShipBowDotException(Exception):
-
-    def __init__(self, *args):
-        if args:
-            self.message = args[0]
-        else:
-            self.message = None
-
-    def __str__(self):
-        if self.message:
-            return 'ShipBowDotException, {0} '.format(self.message)
-        else:
-            return 'Неверно указана начальная точка корабля!'
-
-
 class AddShipOutException(Exception):
 
     def __init__(self, *args):
@@ -86,3 +71,18 @@ class ShipHealthException(Exception):
             return 'ShipHealthException, {0} '.format(self.message)
         else:
             return 'ХП корабля <= 0'
+
+
+class UserAskError(Exception):
+
+    def __init__(self, *args):
+        if args:
+            self.message = args[0]
+        else:
+            self.message = None
+
+    def __str__(self):
+        if self.message:
+            return 'UserAskError, {0} '.format(self.message)
+        else:
+            return 'Не могу найти это место на карте, капитан!'

@@ -40,9 +40,6 @@ class Dot:
 class Ship:
 
     def __init__(self, size, dot_tuple):
-        # self.size = size
-        # self.bow_dot = bow_dot,
-        # self.position = position
         self.health = size
         self.dot_tuple = dot_tuple
 
@@ -71,8 +68,8 @@ class Board:
         x, y = coordinates.get('x'), coordinates.get('y')
         bow_dot = self.find_dot(x, y)
 
-        if not bow_dot:
-            raise ShipBowDotException
+        if not bow_dot or bow_dot.get_status() != 'empty':
+            raise AddShipOutException
 
         dot_list.append(bow_dot)
         for shift in range(1, size):
@@ -81,7 +78,7 @@ class Board:
             else:
                 dot = self.find_dot(x, y + shift)
 
-            if not dot:
+            if not dot or dot.get_status() != 'empty':
                 raise AddShipOutException
 
             dot_list.append(dot)
@@ -92,6 +89,7 @@ class Board:
 
         new_ship = Ship(size, tuple(dot_list))
         self.ships_list.append(new_ship)
+        self.contour(new_ship)
 
     # Метод contour, который обводит корабль по контуру. Он будет полезен и в ходе самой игры, и в при расстановке
     # кораблей (помечает соседние точки, где корабля по правилам быть не может).
@@ -107,8 +105,14 @@ class Board:
                     if not dot or dot in ship.dot_tuple:
                         continue
 
-                    if dot:
+                    if dot and (dot.get_status() == 'empty' or dot.get_status() == 'miss'):
                         dot.status = 'contour'
+
+    # Удаляем контур после расстановки кораблей
+    def del_contour(self):
+        for dot in self.dots_list:
+            if dot.get_status() == 'contour':
+                dot.status = 'empty'
 
     # Метод, который выводит доску в консоль в зависимости от параметра hid.
     def print_board(self):
@@ -168,26 +172,14 @@ class Board:
                 if dot == shot:
                     # Если попали, то переводим статус точки, уменьшаем хп корабля и, если он убит помечаем по контуру
                     shot.status = 'hit'
+                    print('Попадание! Еще выстрел!')
 
                     if not ship.hit_ship():
                         self.contour(ship)
                         self.ships_list.remove(ship)
 
-                    return
+                    return True
 
         # Если не ошибка и не попадание, то промах
         shot.status = 'miss'
-
-
-if __name__ == "__main__":
-    new_board = Board(6, True)
-    new_board.shot(1, 1)
-    new_board.print_board()
-    new_board.shot(5, 6)
-    print()
-    new_board.add_ship(False, 3, x=4, y=1)
-    new_board.shot(4, 1)
-    new_board.shot(4, 2)
-    new_board.shot(4, 3)
-    new_board.shot(4, 4)
-    new_board.print_board()
+        return False
