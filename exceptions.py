@@ -56,3 +56,33 @@ class AddShipOutException(Exception):
             return 'AddShipOutException, {0} '.format(self.message)
         else:
             return 'Точка корабля вышла за пределы доски!'
+
+
+class WrongShotException(Exception):
+
+    def __init__(self, *args):
+        if args:
+            self.message = args[0]
+        else:
+            self.message = None
+
+    def __str__(self):
+        if self.message:
+            return 'WrongShotException, {0} '.format(self.message)
+        else:
+            return 'В эту точку мы уже стреляли!'
+
+
+class ShipHealthException(Exception):
+
+    def __init__(self, *args):
+        if args:
+            self.message = args[0]
+        else:
+            self.message = None
+
+    def __str__(self):
+        if self.message:
+            return 'ShipHealthException, {0} '.format(self.message)
+        else:
+            return 'ХП корабля <= 0'
